@@ -117,15 +117,17 @@ class FBPopoverViewController: UIViewController {
         
         self.view.addSubview(popoverView)
     }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    
+    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
+        super.didRotateFromInterfaceOrientation(fromInterfaceOrientation)
         
         let popoverY = self.fromView.convertPoint(self.fromView.frame.origin, toView: view).y + self.fromView.bounds.height
         self.popoverViewHeight = min(self.contentViewController.preferredContentSize.height + self.popoverView.arrowHeight, view.bounds.height - popoverY - 40)
         
-        self.popoverView.frame = CGRect(x: 0, y: popoverY,
-            width: view.bounds.width, height: popoverViewHeight)
+        UIView.animateWithDuration(0.2, animations: { () -> Void in
+            self.popoverView.frame = CGRect(x: 0, y: popoverY,
+                width: self.view.bounds.width, height: self.popoverViewHeight)
+        })
     }
     
     func showInView(view: UIView) {
