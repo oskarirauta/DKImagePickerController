@@ -117,21 +117,35 @@ class FBPopoverViewController: UIViewController {
         
         self.view.addSubview(popoverView)
     }
-/*
-    
-    // TODO: didRotateFromInterfaceOrientation is deprecated, we should use this..
-    //      But it isn't that easy, this is executed before transition, when we need something that
-    //      is executed after the transition.
+
+#if iOSVersionMinRequired8
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        
+        let popoverY = self.fromView.convertPoint(self.fromView.frame.origin, toView: self.view).y + self.fromView.bounds.height
+
+        self.popoverViewHeight = min(self.contentViewController.preferredContentSize.height + self.popoverView.arrowHeight, self.view.bounds.height - popoverY - 40)
+        
+        coordinator.animateAlongsideTransition({ context in
+                self.popoverView.frame = CGRect(x: 6, y: popoverY,
+                    width: size.width - 12, height: self.popoverViewHeight)
+            }, completion: { context in
+                UIView.animateWithDuration(0.1, animations: { () -> Void in
+                    self.popoverView.frame.origin.y = self.fromView.convertPoint(self.fromView.frame.origin, toView: self.view).y + self.fromView.bounds.height
+                    
+                })
+                
+        })
+        
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
     }
-*/
 
+#else
+    
     override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
             super.didRotateFromInterfaceOrientation(fromInterfaceOrientation)
-        let popoverY = self.fromView.convertPoint(self.fromView.frame.origin, toView: view).y + self.fromView.bounds.height
-        self.popoverViewHeight = min(self.contentViewController.preferredContentSize.height + self.popoverView.arrowHeight, view.bounds.height - popoverY - 40)
+        let popoverY = self.fromView.convertPoint(self.fromView.frame.origin, toView: self.view).y + self.fromView.bounds.height
+        self.popoverViewHeight = min(self.contentViewController.preferredContentSize.height + self.popoverView.arrowHeight, self.view.bounds.height - popoverY - 40)
         
         UIView.animateWithDuration(0.2, animations: { () -> Void in
             self.popoverView.frame = CGRect(x: 6, y: popoverY,
@@ -139,6 +153,8 @@ class FBPopoverViewController: UIViewController {
         })
         
     }
+
+#endif
     
     func showInView(view: UIView) {
         let popoverY = self.fromView.convertPoint(self.fromView.frame.origin, toView: view).y + self.fromView.bounds.height
